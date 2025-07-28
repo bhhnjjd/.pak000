@@ -30,8 +30,8 @@ export default function HexEditor({ data }) {
           .join('')}
       </div>
       <div class="navigation">
-        <button onClick={() => setOffset(offset() - 16)}> Previous
-        <button onClick={() => setOffset(offset() + 16)}> Next
+        <button onClick={() => setOffset(offset() - 16)}>Previous</button>
+        <button onClick={() => setOffset(offset() + 16)}>Next</button>
       </div>
     </div>
   );

@@ -8,7 +8,6 @@ name = "pak_parser"
 crate-type = ["cdylib"]
 
 [dependencies]
-typed-arena = "0.4.5"
 
 [profile.release]
 opt-level = 3
