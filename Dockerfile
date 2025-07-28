@@ -2,8 +2,8 @@
 FROM rust:1.67 as builder
 WORKDIR /app
 RUN cargo install wasm-pack
-COPY pak_parser/Cargo.toml pak_parser/Cargo.lock ./
-RUN cargo build --release -p pak_parser
+COPY pak_parser ./pak_parser
+RUN wasm-pack build pak_parser --release --target web --out-dir pkg
 
 # Node build stage
 FROM node:18-slim as frontend
@@ -14,7 +14,7 @@ RUN npm install && npm run build
 # Final stage
 FROM nginx:1.23-alpine
 WORKDIR /usr/share/nginx/html
-COPY --from=builder /app/target/wasm32-unknown-unknown/release/ ./wasm/
+COPY --from=builder /app/pkg ./pkg/
 COPY --from=frontend /app/dist ./
 COPY nginx.conf /etc/nginx/nginx.conf
 

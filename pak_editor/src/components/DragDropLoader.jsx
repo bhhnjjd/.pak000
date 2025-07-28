@@ -1,4 +1,5 @@
 import { onMount } from 'solid-js';
+import init, { parse_pak_js } from '../../pkg/pak_parser.js';
 
 export default function DragDropLoader() {
   onMount(() => {
@@ -27,18 +28,10 @@ export default function DragDropLoader() {
       const reader = new FileReader();
       reader.onload = async (e) => {
         try {
-          const arrayBuffer = e.target.result;
-
-          // Call WebAssembly parser module
-          const response = await fetch('/pak_parser');
-          const parserModule = await WebAssembly.compile(response);
-          const instance = await WebAssembly.instantiate(parserModule, {
-            memory: new WebAssembly.Memory({ initial: 256 })
-          });
-
-          // Process file using WebAssembly
-          // Implement parsing logic integration
-          console.log('Parsing .pak file...');
+          await init();
+          const bytes = new Uint8Array(e.target.result);
+          const count = parse_pak_js(bytes);
+          console.log(`Parsed ${count} entries`);
         } catch (error) {
           console.error('Error loading .pak file:', error);
         }

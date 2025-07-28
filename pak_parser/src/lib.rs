@@ -1,5 +1,5 @@
-use typed_arena::Arena;
 
+use wasm_bindgen::prelude::*;
 #[derive(Debug)]
 struct PakHeader {
     magic: [u8; 4],
@@ -27,7 +27,7 @@ pub fn parse_pak(data: &[u8]) -> Result<(PakHeader, Vec<PakEntry>), String> {
         ]),
     };
 
-    if header.magic != [*b'P', *b'K', *b'3', *b'M'] {
+    if header.magic != [b'P', b'K', b'3', b'M'] {
         return Err("Invalid .pak file magic".to_string());
     }
 
@@ -41,12 +41,10 @@ pub fn parse_pak(data: &[u8]) -> Result<(PakHeader, Vec<PakEntry>), String> {
     let entries = (0..header.file_count)
         .map(|i| {
             let start = dir_start + (i as usize) * 64;
+            let mut name = [0u8; 56];
+            name[..12].copy_from_slice(&data[start..start + 12]);
             PakEntry {
-                name: [
-                    data[start], data[start + 1], data[start + 2], data[start + 3],
-                    data[start + 4], data[start + 5], data[start + 6], data[start + 7],
-                    data[start + 8], data[start + 9], data[start + 10], data[start + 11],
-                ],
+                name,
                 offset: u32::from_le_bytes([
                     data[start + 12], data[start + 13], data[start + 14], data[start + 15],
                 ]),
@@ -60,16 +58,27 @@ pub fn parse_pak(data: &[u8]) -> Result<(PakHeader, Vec<PakEntry>), String> {
     Ok((header, entries))
 }
 
+#[wasm_bindgen]
+pub fn parse_pak_js(data: &[u8]) -> Result<u32, JsValue> {
+    match parse_pak(data) {
+        Ok((header, _)) => Ok(header.file_count),
+        Err(e) => Err(JsValue::from_str(&e)),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_pak_parser() {
-        let data = vec![0; 1024]; // Replace with actual sample.pak content
+        let mut data = vec![0u8; 128];
+        data[0..4].copy_from_slice(b"PK3M");
+        data[4..8].copy_from_slice(&1u32.to_le_bytes());
+        data[8..12].copy_from_slice(&64u32.to_le_bytes());
         match parse_pak(&data) {
             Ok((header, entries)) => {
-                assert_eq!(header.magic, [*b'P', *b'K', *b'3', *b'M']);
+                assert_eq!(header.magic, [b'P', b'K', b'3', b'M']);
                 assert_eq!(entries.len(), header.file_count as usize);
             }
             Err(e) => {
@@ -78,3 +87,4 @@ mod tests {
         }
     }
 }
+

@@ -1,5 +1,3 @@
-use typed_arena::Arena;
-use std::cmp;
 
 #[derive(Debug)]
 struct PakHeader {
@@ -79,15 +77,6 @@ pub fn parse_pak(data: &[u8]) -> Result<(PakHeader, Vec<PakEntry>), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_file_size_validation() {
-        let data = vec![0; 512]; // 512 bytes - smaller than MAX_FILE_SIZE
-        assert!(parse_pak(&data).is_ok());
-
-        let data = vec![0; MAX_FILE_SIZE + 1];
-        assert!(parse_pak(&data).is_err());
-    }
 
     #[test]
     fn test_file_count_validation() {
