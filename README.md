@@ -2,6 +2,8 @@
 
 This repository contains a simple WebAssembly-based PAK file parser written in Rust and a minimal JavaScript front end.
 
+For a Chinese version of this document, see [README.zh-CN.md](README.zh-CN.md).
+
 ## Known Issues and Fixes
 
 * **Outdated `typed-arena` dependency** – The crate version used in `Cargo.toml` no longer exists on crates.io. It has been removed.
@@ -33,6 +35,18 @@ To run the test suite for the Rust parser:
 cd pak_parser
 cargo test
 ```
+
+## Usage
+
+A small example archive is included as `sample.pak`. After building the
+JavaScript bundle you can start a development server:
+
+```bash
+cd pak_editor
+npm start
+```
+
+This opens a browser window where you can load and inspect `.pak` files.
 
 ## Security Considerations
 
